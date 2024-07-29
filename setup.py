@@ -29,7 +29,6 @@ import sys
 import shutil
 import platform
 from setuptools import setup
-from setuptools.command.test import test as test_command
 
 CPY = platform.python_implementation() == 'CPython'
 PYPY = platform.python_implementation() == 'PyPy'
@@ -233,27 +232,6 @@ test_requirements = [
 ]
 
 
-class PyTest(test_command):
-    """
-    pytest integration for setuptools.
-
-    see:
-      - http://pytest.org/latest/goodpractises.html#integration-with-setuptools-test-commands
-      - https://github.com/pyca/cryptography/pull/678/files
-    """
-
-    def finalize_options(self):
-        test_command.finalize_options(self)
-        self.test_args = []
-        self.test_suite = True
-
-    def run_tests(self):
-        # Import here because in module scope the eggs are not loaded.
-        import pytest
-        errno = pytest.main(self.test_args)
-        sys.exit(errno)
-
-
 setup(
     name='autobahn',
     version=__version__,  # noqa
@@ -287,9 +265,6 @@ setup(
         'ui': extras_require_ui,
     },
     tests_require=test_requirements,
-    cmdclass={
-        'test': PyTest
-    },
     packages=packages,
     package_data=package_data,
     cffi_modules=cffi_modules,
